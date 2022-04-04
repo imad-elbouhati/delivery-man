@@ -9,13 +9,13 @@ var usersDeliveryRef = db.collection("delivery-users")
 
 var orderDeliveryRef = db.collection("order-delivery")
 
-var i = 0
+navigator.geolocation.getCurrentPosition(getPosition)
+
 
 this.orderDeliveryRef.onSnapshot(function (querySnapshot) {
     var users = [];
 
     querySnapshot.forEach(function (doc) {
-        i += 1
         var data = doc.data()
         if(data.accepted == false) {
             let x = {docID:doc.id,data}
@@ -25,19 +25,23 @@ this.orderDeliveryRef.onSnapshot(function (querySnapshot) {
         
     });
 
-    console.log("IIIIII",i);
-    console.log("Somthing added: ", ...users);
+   // console.log("Somthing added: ", ...users);
 });
 
 var map = document.getElementById("map")
 
 
+var mlat,mlong 
+
+var i = 0
 
 function setPopUpFromClient(order) {
-
+   
+    console.log(i);
     let userLat = order.data.lat
 
     let userLong = order.data.lg
+
 
     var customPopup = "<img src='client.png' width='90px'/><br/<br/><b>Name: </b><br/<br/><b>Order: </b><br/<br/><b>id: </b><br/<br/><br/<br/>&nbsp&nbsp&nbsp<button background='red'>Accepter</button>";
     var customOptions = { 'maxWidth': '500', 'className': 'custom' };
@@ -47,6 +51,23 @@ function setPopUpFromClient(order) {
     });
 
     L.marker([userLat, userLong], { icon: rennesicone }).bindPopup(customPopup, customOptions).addTo(map_init);
+
+    L.Routing.control({
+        waypoints: [
+          L.latLng(mlat,mlong),
+          L.latLng( order.data.lat, order.data.lg)
+        ]
+      }).addTo(map_init);
+}
+
+
+function getPosition(position) {
+
+
+    mlat = position.coords.latitude
+    mlong = position.coords.longitude
+
+   
 
 }
 
